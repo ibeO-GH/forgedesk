@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Task } from "../types/task";
 import { filterTasks } from "../utils/taskFilters";
+import TaskBadge from "../components/tasks/TaskBadge";
+import TaskItem from "../components/tasks/TaskItem";
 
 interface DashboardProps {
   tasks: Task[];
@@ -137,59 +139,13 @@ function Dashboard({
         ) : (
           <div className="mt-4 space-y-3">
             {paginatedTasks.map((task) => (
-              <div
+              <TaskItem
                 key={task.id}
-                className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-sm"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="break-words font-medium text-gray-900">
-                      {task.title}
-                    </p>
-
-                    <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium capitalize text-gray-700">
-                      {task.priority} priority
-                    </span>
-                  </div>
-
-                  <p className="mt-2 text-xs text-gray-500">
-                    Status: {task.status.replace("-", "")}
-                  </p>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-2">
-                  <select
-                    value={task.status}
-                    onChange={(event) =>
-                      onUpdateStatus(
-                        task.id,
-                        event.target.value as Task["status"],
-                      )
-                    }
-                    className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-graay-700 outline-none focus:border-gray-900"
-                  >
-                    <option value="todo">To Do</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="done">Done</option>
-                  </select>
-
-                  <button
-                    type="button"
-                    onClick={() => onEditTask(task)}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => onDeleteTask(task.id)}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+                task={task}
+                onEdit={onEditTask}
+                onUpdateStatus={onUpdateStatus}
+                onDelete={onDeleteTask}
+              />
             ))}
 
             {totalPages > 1 && (
