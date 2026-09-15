@@ -62,7 +62,7 @@ function Dashboard({
   }, [currentPage, totalPages]);
 
   return (
-    <main className="flex-1 p-6">
+    <main className="min-w-0 flex-1 p-4 sm:p-6">
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <p className="text-sm text-gray-500">Total Tasks</p>
@@ -90,13 +90,13 @@ function Dashboard({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Recent Tasks</h2>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <input
               type="search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Search tasks..."
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-900 sm:w-56"
             />
 
             <select
@@ -104,7 +104,7 @@ function Dashboard({
               onChange={(event) =>
                 setStatusFilter(event.target.value as "all" | Task["status"])
               }
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm sm:w-auto"
             >
               <option value="all">All Tasks</option>
               <option value="todo">To Do</option>
@@ -119,7 +119,7 @@ function Dashboard({
                   event.target.value as "all" | Task["priority"],
                 )
               }
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm sm:w-auto"
             >
               <option value="all">All Priorities</option>
               <option value="low">Low Priority</option>
@@ -130,11 +130,29 @@ function Dashboard({
         </div>
 
         {filteredTasks.length === 0 ? (
-          <p className="mt-4 text-sm text-gray-500">
-            {statusFilter === "all"
-              ? "No tasks yet. Create your first task."
-              : "No tasks match this filter."}
-          </p>
+          <div className="mt-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
+            {tasks.length === 0 ? (
+              <>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  No tasks yet
+                </h3>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Create your first task to start managing your workspace.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  No matching tasks
+                </h3>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Try adjusting your search or filters.
+                </p>
+              </>
+            )}
+          </div>
         ) : (
           <div className="mt-4 space-y-3">
             {paginatedTasks.map((task) => (
@@ -146,36 +164,34 @@ function Dashboard({
                 onDelete={onDeleteTask}
               />
             ))}
+          </div>
+        )}
 
-            {totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCurrentPage((page) => Math.max(page - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Previous
-                </button>
+        {totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+              disabled={currentPage === 1}
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
 
-                <p className="text-sm text-gray-500">
-                  Page {currentPage} of {totalPages}
-                </p>
+            <p className="text-sm text-gray-500">
+              Page {currentPage} of {totalPages}
+            </p>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCurrentPage((page) => Math.min(page + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentPage((page) => Math.min(page + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

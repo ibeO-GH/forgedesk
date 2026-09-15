@@ -16,7 +16,7 @@ function App() {
     useTasks();
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50 sm:flex-row">
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col">

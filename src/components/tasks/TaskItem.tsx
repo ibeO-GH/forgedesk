@@ -13,7 +13,7 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-sm">
+    <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="break-words font-medium text-gray-900">{task.title}</p>
@@ -24,15 +24,15 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
           <TaskBadge type="status" value={task.status} />
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
         <select
           value={task.status}
           onChange={(event) =>
             onUpdateStatus(task.id, event.target.value as Task["status"])
           }
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-gray-900"
+          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-gray-900 sm:flex-none"
         >
-          <option value="todo">To Do</option>{" "}
+          <option value="todo">To Do</option>
           <option value="in-progress">In Progress</option>
           <option value="done">Done</option>
         </select>
@@ -40,7 +40,7 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
         <button
           type="button"
           onClick={() => onEdit(task)}
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:flex-none"
         >
           Edit
         </button>
@@ -48,7 +48,7 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
         <button
           type="button"
           onClick={() => setIsDeleteConfirmOpen(true)}
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 sm:flex-none"
         >
           Delete
         </button>
