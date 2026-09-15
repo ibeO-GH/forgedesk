@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Task } from "../types/task";
 import { filterTasks } from "../utils/taskFilters";
-import TaskBadge from "../components/tasks/TaskBadge";
 import TaskItem from "../components/tasks/TaskItem";
 
 interface DashboardProps {
