@@ -6,14 +6,19 @@ import CreateTaskModal from "./components/tasks/CreateTaskModal";
 import useTasks from "./hooks/useTasks";
 import EditTaskModal from "./components/tasks/EditTaskModal";
 import type { Task } from "./types/task";
+import useTasksQuery from "./hooks/useTasksQuery";
+import useCreateTask from "./hooks/useCreateTask";
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const { tasks, createTask, updateTask, updateTaskStatus, deleteTask } =
-    useTasks();
+  const { updateTask, updateTaskStatus, deleteTask } = useTasks();
+
+  const { data: tasks = [], isLoading, isError, error } = useTasksQuery();
+
+  const createTaskMutation = useCreateTask();
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 sm:flex-row">
@@ -23,6 +28,9 @@ function App() {
         <Topbar onCreateTask={() => setIsCreateTaskOpen(true)} />
         <Dashboard
           tasks={tasks}
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
           onEditTask={(task) => setEditingTask(task)}
           onUpdateStatus={updateTaskStatus}
           onDeleteTask={deleteTask}
@@ -32,7 +40,16 @@ function App() {
       {isCreateTaskOpen && (
         <CreateTaskModal
           onClose={() => setIsCreateTaskOpen(false)}
-          onCreate={createTask}
+          onCreate={(title, priority) => {
+            createTaskMutation.mutate(
+              { title, priority },
+              {
+                onSuccess: () => {
+                  setIsCreateTaskOpen(false);
+                },
+              },
+            );
+          }}
         />
       )}
 

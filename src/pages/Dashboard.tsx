@@ -5,6 +5,9 @@ import TaskItem from "../components/tasks/TaskItem";
 
 interface DashboardProps {
   tasks: Task[];
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
   onEditTask: (task: Task) => void;
   onUpdateStatus: (taskId: string, status: Task["status"]) => void;
   onDeleteTask: (taskId: string) => void;
@@ -12,6 +15,9 @@ interface DashboardProps {
 
 function Dashboard({
   tasks,
+  isLoading,
+  isError,
+  error,
   onEditTask,
   onUpdateStatus,
   onDeleteTask,
@@ -60,6 +66,30 @@ function Dashboard({
       setCurrentPage(totalPages);
     }
   }, [currentPage, totalPages]);
+
+  if (isLoading) {
+    return (
+      <main className="min-w-0 flex-1 p-4 sm:p-6">
+        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
+          <p className="text-sm text-gray-500">Loading tasks...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (isError) {
+    return (
+      <main className="min-w-0 flex-1 p-4 sm:p-6">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
+          <h2 className="font-semibold text-red-800">Failed to load tasks</h2>
+
+          <p className="mt-2 text-sm text-red-600">
+            {error?.message || "Something went wrong while loading tasks."}
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-w-0 flex-1 p-4 sm:p-6">
