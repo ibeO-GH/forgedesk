@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import taskRoutes from "./routes/taskRoutes.js";
 
 dotenv.config();
 
@@ -12,6 +13,8 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/tasks", taskRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({
