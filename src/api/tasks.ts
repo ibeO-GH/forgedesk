@@ -9,7 +9,14 @@ export async function getTasks(): Promise<Task[]> {
     throw new Error("Failed to fetch tasks");
   }
 
-  return response.json();
+  const tasks = await response.json();
+
+  return tasks.map((task: Task & { _id: string }) => ({
+    id: task._id,
+    title: task.title,
+    status: task.status,
+    priority: task.priority,
+  }));
 }
 
 export async function createTask(
@@ -31,5 +38,40 @@ export async function createTask(
     throw new Error("Failed to create task");
   }
 
-  return response.json();
+  const task = await response.json();
+
+  return {
+    id: task._id,
+    title: task.title,
+    status: task.status,
+    priority: task.priority,
+  };
+}
+
+export async function updateTaskStatus(
+  taskId: string,
+  status: Task["status"],
+): Promise<Task> {
+  const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      status,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update task status");
+  }
+
+  const task = await response.json();
+
+  return {
+    id: task._id,
+    title: task.title,
+    status: task.status,
+    priority: task.priority,
+  };
 }

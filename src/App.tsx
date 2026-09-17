@@ -8,17 +8,20 @@ import EditTaskModal from "./components/tasks/EditTaskModal";
 import type { Task } from "./types/task";
 import useTasksQuery from "./hooks/useTasksQuery";
 import useCreateTask from "./hooks/useCreateTask";
+import useUpdateTaskStatus from "./hooks/useUpdateTaskStatus";
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const { updateTask, updateTaskStatus, deleteTask } = useTasks();
+  const { updateTask, deleteTask } = useTasks();
 
   const { data: tasks = [], isLoading, isError, error } = useTasksQuery();
 
   const createTaskMutation = useCreateTask();
+
+  const updateTaskStatusMutation = useUpdateTaskStatus();
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 sm:flex-row">
@@ -32,7 +35,9 @@ function App() {
           isError={isError}
           error={error}
           onEditTask={(task) => setEditingTask(task)}
-          onUpdateStatus={updateTaskStatus}
+          onUpdateStatus={(taskId, status) =>
+            updateTaskStatusMutation.mutate({ taskId, status })
+          }
           onDeleteTask={deleteTask}
         />
       </div>
