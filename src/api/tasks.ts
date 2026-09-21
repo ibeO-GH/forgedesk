@@ -104,3 +104,13 @@ export async function updateTask(
     priority: task.priority,
   };
 }
+
+export async function deleteTask(taskId: string): Promise<void> {
+  const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete task");
+  }
+}

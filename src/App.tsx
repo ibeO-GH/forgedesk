@@ -3,20 +3,18 @@ import Sidebar from "./components/layout/Sidebar";
 import Topbar from "./components/layout/Topbar";
 import Dashboard from "./pages/Dashboard";
 import CreateTaskModal from "./components/tasks/CreateTaskModal";
-import useTasks from "./hooks/useTasks";
 import EditTaskModal from "./components/tasks/EditTaskModal";
 import type { Task } from "./types/task";
 import useTasksQuery from "./hooks/useTasksQuery";
 import useCreateTask from "./hooks/useCreateTask";
 import useUpdateTaskStatus from "./hooks/useUpdateTaskStatus";
 import useUpdateTask from "./hooks/useUpdateTask";
+import useDeleteTask from "./hooks/useDeleteTask";
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-
-  const { deleteTask } = useTasks();
 
   const { data: tasks = [], isLoading, isError, error } = useTasksQuery();
 
@@ -25,6 +23,8 @@ function App() {
   const updateTaskStatusMutation = useUpdateTaskStatus();
 
   const updateTaskMutation = useUpdateTask();
+
+  const deleteTaskMutation = useDeleteTask();
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 sm:flex-row">
@@ -41,7 +41,9 @@ function App() {
           onUpdateStatus={(taskId, status) =>
             updateTaskStatusMutation.mutate({ taskId, status })
           }
-          onDeleteTask={deleteTask}
+          onDeleteTask={(taskId) => {
+            deleteTaskMutation.mutate(taskId);
+          }}
         />
       </div>
 

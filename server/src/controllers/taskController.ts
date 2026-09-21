@@ -77,3 +77,25 @@ export async function updateTask(req: Request, res: Response) {
     });
   }
 }
+
+export async function deleteTask(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+
+    const task = await Task.findByIdAndDelete(id);
+
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    console.error("Failed to delete task:", error);
+
+    res.status(500).json({
+      message: "Failed to delete task",
+    });
+  }
+}
