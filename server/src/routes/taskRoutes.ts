@@ -5,8 +5,11 @@ import {
   updateTask,
   deleteTask,
 } from "../controllers/taskController.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = Router();
+
+router.use(authenticate);
 
 router.post("/", createTask);
 
