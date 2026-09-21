@@ -2,8 +2,18 @@ import type { Task } from "../types/task";
 
 const API_URL = "http://localhost:5000/api";
 
+function getAuthHeaders() {
+  const token = localStorage.getItem("forgedesk_token");
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+
 export async function getTasks(): Promise<Task[]> {
-  const response = await fetch(`${API_URL}/tasks`);
+  const response = await fetch(`${API_URL}/tasks`, {
+    headers: getAuthHeaders(),
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch tasks");
@@ -27,6 +37,7 @@ export async function createTask(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify({
       title,
@@ -56,6 +67,7 @@ export async function updateTaskStatus(
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify({
       status,
@@ -87,6 +99,7 @@ export async function updateTask(
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(updates),
   });
@@ -108,6 +121,7 @@ export async function updateTask(
 export async function deleteTask(taskId: string): Promise<void> {
   const response = await fetch(`${API_URL}/tasks/${taskId}`, {
     method: "DELETE",
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {

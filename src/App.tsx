@@ -10,8 +10,15 @@ import useCreateTask from "./hooks/useCreateTask";
 import useUpdateTaskStatus from "./hooks/useUpdateTaskStatus";
 import useUpdateTask from "./hooks/useUpdateTask";
 import useDeleteTask from "./hooks/useDeleteTask";
+import Login from "./pages/Login";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Login />;
+  }
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
   const [editingTask, setEditingTask] = useState<Task | null>(null);
