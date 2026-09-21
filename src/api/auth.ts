@@ -53,3 +53,25 @@ export async function register(
 
   return data;
 }
+
+export async function getCurrentUser(): Promise<AuthUser> {
+  const token = localStorage.getItem("forgedesk_token");
+
+  if (!token) {
+    throw new Error("No authentication token");
+  }
+
+  const response = await fetch(`${API_URL}/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to verify session");
+  }
+
+  return data;
+}

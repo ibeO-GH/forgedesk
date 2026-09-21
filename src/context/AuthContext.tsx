@@ -1,9 +1,16 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { AuthUser } from "../api/auth";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { getCurrentUser, type AuthUser } from "../api/auth";
 
 interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
+  isLoading: boolean;
   loginUser: (user: AuthUser, token: string) => void;
   logout: () => void;
 }
@@ -15,15 +22,41 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    const storedUser = localStorage.getItem("forgedesk_user");
+  const [user, setUser] = useState<AuthUser | null>(null);
 
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [token, setToken] = useState<string | null>(null);
 
-  const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem("forgedesk_token");
-  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function restoreSession() {
+      const storedToken = localStorage.getItem("forgedesk_token");
+
+      if (!storedToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const currentUser = await getCurrentUser();
+
+        setUser(currentUser);
+        setToken(storedToken);
+
+        localStorage.setItem("forgedesk_user", JSON.stringify(currentUser));
+      } catch {
+        localStorage.removeItem("forgedesk_token");
+        localStorage.removeItem("forgedesk_user");
+
+        setToken(null);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    restoreSession();
+  }, []);
 
   function loginUser(authUser: AuthUser, authToken: string) {
     setUser(authUser);
@@ -46,6 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       value={{
         user,
         token,
+        isLoading,
         loginUser,
         logout,
       }}

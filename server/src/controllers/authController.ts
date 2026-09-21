@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import type { AuthenticatedRequest } from "../middleware/authMiddleware.js";
 
 export async function register(req: Request, res: Response) {
   try {
@@ -109,6 +110,30 @@ export async function login(req: Request, res: Response) {
 
     res.status(500).json({
       message: "Failed to login user",
+    });
+  }
+}
+
+export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
+  try {
+    const user = await User.findById(req.userId).select("_id name email");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error("Failed to fetch current user:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch current user",
     });
   }
 }

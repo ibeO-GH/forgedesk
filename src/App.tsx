@@ -14,24 +14,34 @@ import Login from "./pages/Login";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
+
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  const {
+    data: tasks = [],
+    isLoading: isTasksLoading,
+    isError,
+    error,
+  } = useTasksQuery();
+
+  const createTaskMutation = useCreateTask();
+  const updateTaskStatusMutation = useUpdateTaskStatus();
+  const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
+
+  if (isAuthLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <p className="text-sm text-gray-500">Checking your session...</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return <Login />;
   }
-  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
-
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-
-  const { data: tasks = [], isLoading, isError, error } = useTasksQuery();
-
-  const createTaskMutation = useCreateTask();
-
-  const updateTaskStatusMutation = useUpdateTaskStatus();
-
-  const updateTaskMutation = useUpdateTask();
-
-  const deleteTaskMutation = useDeleteTask();
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 sm:flex-row">
@@ -39,9 +49,10 @@ function App() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onCreateTask={() => setIsCreateTaskOpen(true)} />
+
         <Dashboard
           tasks={tasks}
-          isLoading={isLoading}
+          isLoading={isTasksLoading}
           isError={isError}
           error={error}
           onEditTask={(task) => setEditingTask(task)}
