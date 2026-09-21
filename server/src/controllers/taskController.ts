@@ -34,16 +34,33 @@ export async function getTasks(_req: Request, res: Response) {
   }
 }
 
-export async function updateTaskStatus(req: Request, res: Response) {
+export async function updateTask(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { title, priority, status } = req.body;
 
-    const task = await Task.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true, runValidators: true },
-    );
+    const updates: {
+      title?: string;
+      priority?: "low" | "medium" | "high";
+      status?: "todo" | "in-progress" | "done";
+    } = {};
+
+    if (title !== undefined) {
+      updates.title = title;
+    }
+
+    if (priority !== undefined) {
+      updates.priority = priority;
+    }
+
+    if (status !== undefined) {
+      updates.status = status;
+    }
+
+    const task = await Task.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!task) {
       return res.status(404).json({
@@ -53,10 +70,10 @@ export async function updateTaskStatus(req: Request, res: Response) {
 
     res.status(200).json(task);
   } catch (error) {
-    console.error("Failed to update task status:", error);
+    console.error("Failed to update task:", error);
 
     res.status(500).json({
-      message: "Failed to update task status",
+      message: "Failed to update task",
     });
   }
 }

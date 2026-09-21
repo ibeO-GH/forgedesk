@@ -9,19 +9,22 @@ import type { Task } from "./types/task";
 import useTasksQuery from "./hooks/useTasksQuery";
 import useCreateTask from "./hooks/useCreateTask";
 import useUpdateTaskStatus from "./hooks/useUpdateTaskStatus";
+import useUpdateTask from "./hooks/useUpdateTask";
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const { updateTask, deleteTask } = useTasks();
+  const { deleteTask } = useTasks();
 
   const { data: tasks = [], isLoading, isError, error } = useTasksQuery();
 
   const createTaskMutation = useCreateTask();
 
   const updateTaskStatusMutation = useUpdateTaskStatus();
+
+  const updateTaskMutation = useUpdateTask();
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 sm:flex-row">
@@ -62,7 +65,20 @@ function App() {
         <EditTaskModal
           task={editingTask}
           onClose={() => setEditingTask(null)}
-          onUpdate={updateTask}
+          onUpdate={(taskId, updates) => {
+            updateTaskMutation.mutate(
+              {
+                taskId,
+                title: updates.title ?? editingTask.title,
+                priority: updates.priority ?? editingTask.priority,
+              },
+              {
+                onSuccess: () => {
+                  setEditingTask(null);
+                },
+              },
+            );
+          }}
         />
       )}
     </div>

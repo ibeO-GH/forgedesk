@@ -26,8 +26,6 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
       title: title.trim(),
       priority,
     });
-
-    onClose();
   }
 
   return (
