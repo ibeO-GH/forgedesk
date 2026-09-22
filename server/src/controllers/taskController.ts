@@ -1,8 +1,12 @@
-import type { Response } from "express";
+import type { NextFunction, Response } from "express";
 import type { AuthenticatedRequest } from "../middleware/authMiddleware.js";
 import Task from "../models/Task.js";
 
-export async function createTask(req: AuthenticatedRequest, res: Response) {
+export async function createTask(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { title, priority } = req.body;
 
@@ -14,15 +18,15 @@ export async function createTask(req: AuthenticatedRequest, res: Response) {
 
     res.status(201).json(task);
   } catch (error) {
-    console.error("Failed to create task:", error);
-
-    res.status(500).json({
-      message: "Failed to create task",
-    });
+    next(error);
   }
 }
 
-export async function getTasks(req: AuthenticatedRequest, res: Response) {
+export async function getTasks(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const tasks = await Task.find({
       userId: req.userId,
@@ -30,15 +34,15 @@ export async function getTasks(req: AuthenticatedRequest, res: Response) {
 
     res.status(200).json(tasks);
   } catch (error) {
-    console.error("Failed to fetch tasks:", error);
-
-    res.status(500).json({
-      message: "Failed to fetch tasks",
-    });
+    next(error);
   }
 }
 
-export async function updateTask(req: AuthenticatedRequest, res: Response) {
+export async function updateTask(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { id } = req.params;
     const { title, priority, status } = req.body;
@@ -81,15 +85,15 @@ export async function updateTask(req: AuthenticatedRequest, res: Response) {
 
     res.status(200).json(task);
   } catch (error) {
-    console.error("Failed to update task:", error);
-
-    res.status(500).json({
-      message: "Failed to update task",
-    });
+    next(error);
   }
 }
 
-export async function deleteTask(req: AuthenticatedRequest, res: Response) {
+export async function deleteTask(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { id } = req.params;
 
@@ -106,10 +110,6 @@ export async function deleteTask(req: AuthenticatedRequest, res: Response) {
 
     res.status(204).send();
   } catch (error) {
-    console.error("Failed to delete task:", error);
-
-    res.status(500).json({
-      message: "Failed to delete task",
-    });
+    next(error);
   }
 }

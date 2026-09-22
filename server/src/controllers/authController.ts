@@ -1,10 +1,14 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import type { AuthenticatedRequest } from "../middleware/authMiddleware.js";
 
-export async function register(req: Request, res: Response) {
+export async function register(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { name, email, password } = req.body;
 
@@ -53,15 +57,15 @@ export async function register(req: Request, res: Response) {
       token,
     });
   } catch (error) {
-    console.error("Failed to register user:", error);
-
-    res.status(500).json({
-      message: "Failed to register user",
-    });
+    next(error);
   }
 }
 
-export async function login(req: Request, res: Response) {
+export async function login(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { email, password } = req.body;
 
@@ -110,15 +114,15 @@ export async function login(req: Request, res: Response) {
       token,
     });
   } catch (error) {
-    console.error("Failed to login user:", error);
-
-    res.status(500).json({
-      message: "Failed to login user",
-    });
+    next(error);
   }
 }
 
-export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
+export async function getCurrentUser(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const user = await User.findById(req.userId).select("_id name email role");
 
@@ -135,10 +139,6 @@ export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
       role: user.role,
     });
   } catch (error) {
-    console.error("Failed to fetch current user:", error);
-
-    res.status(500).json({
-      message: "Failed to fetch current user",
-    });
+    next(error);
   }
 }

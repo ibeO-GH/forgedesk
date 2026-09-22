@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import taskRoutes from "./routes/taskRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import { errorHandler } from "./middleware/errorMiddleware.js";
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ app.get("/api/health", (_req, res) => {
     message: "ForgeDesk API is running",
   });
 });
+
+app.use(errorHandler);
 
 async function startServer() {
   try {
