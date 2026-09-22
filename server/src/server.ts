@@ -1,33 +1,11 @@
-import express from "express";
-import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import helmet from "helmet";
-import taskRoutes from "./routes/taskRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import { errorHandler } from "./middleware/errorMiddleware.js";
+import app from "./app.js";
 
 dotenv.config();
 
-const app = express();
-
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
-
-app.use(cors());
-app.use(express.json());
-app.use(helmet());
-
-app.use("/api/tasks", taskRoutes);
-app.use("/api/auth", authRoutes);
-
-app.get("/api/health", (_req, res) => {
-  res.json({
-    message: "ForgeDesk API is running",
-  });
-});
-
-app.use(errorHandler);
 
 async function startServer() {
   try {
