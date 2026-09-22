@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import helmet from "helmet";
 import taskRoutes from "./routes/taskRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -15,6 +16,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 app.use(cors());
 app.use(express.json());
+app.use(helmet());
 
 app.use("/api/tasks", taskRoutes);
 app.use("/api/auth", authRoutes);
@@ -31,6 +33,10 @@ async function startServer() {
   try {
     if (!MONGODB_URI) {
       throw new Error("MONOGODB_URI is not defined");
+    }
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined");
     }
 
     await mongoose.connect(MONGODB_URI, {

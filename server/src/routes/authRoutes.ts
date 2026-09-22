@@ -1,4 +1,5 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import {
   login,
   register,
@@ -9,11 +10,19 @@ import { requireRole } from "../middleware/roleMiddleware.js";
 import { validate } from "../middleware/validate.js";
 import { registerSchema, loginSchema } from "../validation/authSchemas.js";
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: {
+    message: "Too many authentication attempts. Please try again later.",
+  },
+});
+
 const router = Router();
 
-router.post("/register", validate(registerSchema), register);
+router.post("/register", authLimiter, validate(registerSchema), register);
 
-router.post("/login", validate(loginSchema), login);
+router.post("/login", authLimiter, validate(loginSchema), login);
 
 router.get("/me", authenticate, getCurrentUser);
 
