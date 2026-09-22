@@ -20,6 +20,7 @@ function Topbar({ onCreateTask }: TopbarProps) {
         <div className="text-sm sm:text-right">
           <p className="font-medium text-gray-900">{user?.name}</p>
           <p className="text-xs text-gray-500">{user?.email}</p>
+          <p className="text-xs capitalize text-gray-500">{user?.role}</p>
         </div>
 
         <button
