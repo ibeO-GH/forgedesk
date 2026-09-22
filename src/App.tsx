@@ -12,9 +12,11 @@ import useUpdateTask from "./hooks/useUpdateTask";
 import useDeleteTask from "./hooks/useDeleteTask";
 import Login from "./pages/Login";
 import { useAuth } from "./context/AuthContext";
+import Register from "./pages/Register";
 
 function App() {
   const { user, isLoading: isAuthLoading } = useAuth();
+  const [authPage, setAuthPage] = useState<"login" | "register">("login");
 
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -40,7 +42,11 @@ function App() {
   }
 
   if (!user) {
-    return <Login />;
+    return authPage === "login" ? (
+      <Login onRegister={() => setAuthPage("register")} />
+    ) : (
+      <Register onLogin={() => setAuthPage("login")} />
+    );
   }
 
   return (
