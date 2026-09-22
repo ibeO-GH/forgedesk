@@ -6,12 +6,14 @@ import {
 } from "../controllers/authController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 import { requireRole } from "../middleware/roleMiddleware.js";
+import { validate } from "../middleware/validate.js";
+import { registerSchema, loginSchema } from "../validation/authSchemas.js";
 
 const router = Router();
 
-router.post("/register", register);
+router.post("/register", validate(registerSchema), register);
 
-router.post("/login", login);
+router.post("/login", validate(loginSchema), login);
 
 router.get("/me", authenticate, getCurrentUser);
 

@@ -6,16 +6,21 @@ import {
   deleteTask,
 } from "../controllers/taskController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
+import { validate } from "../middleware/validate.js";
+import {
+  createTaskSchema,
+  updateTaskSchema,
+} from "../validation/taskSchemas.js";
 
 const router = Router();
 
 router.use(authenticate);
 
-router.post("/", createTask);
+router.post("/", validate(createTaskSchema), createTask);
 
 router.get("/", getTasks);
 
-router.patch("/:id", updateTask);
+router.patch("/:id", validate(updateTaskSchema), updateTask);
 
 router.delete("/:id", deleteTask);
 
