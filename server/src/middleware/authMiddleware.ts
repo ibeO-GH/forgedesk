@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
+  userRole?: "user" | "admin";
 }
 
 export function authenticate(
@@ -29,9 +30,11 @@ export function authenticate(
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       userId: string;
+      role: "user" | "admin";
     };
 
     req.userId = decoded.userId;
+    req.userRole = decoded.role;
 
     next();
   } catch {

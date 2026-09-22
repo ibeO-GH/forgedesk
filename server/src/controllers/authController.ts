@@ -35,6 +35,7 @@ export async function register(req: Request, res: Response) {
     const token = jwt.sign(
       {
         userId: user._id,
+        role: user.role,
       },
       process.env.JWT_SECRET as string,
       {
@@ -47,6 +48,7 @@ export async function register(req: Request, res: Response) {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
       token,
     });
@@ -90,6 +92,7 @@ export async function login(req: Request, res: Response) {
     const token = jwt.sign(
       {
         userId: user._id,
+        role: user.role,
       },
       process.env.JWT_SECRET as string,
       {
@@ -102,6 +105,7 @@ export async function login(req: Request, res: Response) {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
       token,
     });
@@ -116,7 +120,7 @@ export async function login(req: Request, res: Response) {
 
 export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
   try {
-    const user = await User.findById(req.userId).select("_id name email");
+    const user = await User.findById(req.userId).select("_id name email role");
 
     if (!user) {
       return res.status(404).json({
@@ -128,6 +132,7 @@ export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
       id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
     });
   } catch (error) {
     console.error("Failed to fetch current user:", error);
