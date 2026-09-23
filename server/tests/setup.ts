@@ -20,6 +20,5 @@ export async function clearTestDatabase() {
 }
 
 export async function disconnectTestDatabase() {
-  await mongoose.disconnect();
   await mongoServer.stop();
 }
