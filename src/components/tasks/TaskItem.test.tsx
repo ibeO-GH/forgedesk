@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import TaskItem from "./TaskItem";
+import { axe } from "jest-axe";
 
 const task = {
   id: "task-123",
@@ -26,9 +27,13 @@ describe("TaskItem", () => {
     expect(screen.getByText("high")).toBeInTheDocument();
     expect(screen.getByText("todo")).toBeInTheDocument();
 
-    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Edit Build authentication" }),
+    ).toBeInTheDocument();
 
-    expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Delete Build authentication" }),
+    ).toBeInTheDocument();
   });
 
   it("calls onUpdateStatus when the status changes", async () => {
@@ -64,7 +69,9 @@ describe("TaskItem", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Edit" }));
+    await user.click(
+      screen.getByRole("button", { name: "Edit Build authentication" }),
+    );
 
     expect(onEdit).toHaveBeenCalledWith(task);
   });
@@ -81,7 +88,15 @@ describe("TaskItem", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Delete" }));
+    await user.click(
+      screen.getByRole("button", { name: "Delete Build authentication" }),
+    );
+
+    expect(
+      screen.getByRole("dialog", {
+        name: "Delete task?",
+      }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole("heading", { name: "Delete task?" }),
@@ -106,7 +121,9 @@ describe("TaskItem", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Delete" }));
+    await user.click(
+      screen.getByRole("button", { name: "Delete Build authentication" }),
+    );
 
     await user.click(screen.getByRole("button", { name: "Cancel" }));
 
@@ -128,18 +145,83 @@ describe("TaskItem", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Delete" }));
+    await user.click(
+      screen.getByRole("button", { name: "Delete Build authentication" }),
+    );
 
-    const deleteButtons = screen.getAllByRole("button", {
-      name: "Delete",
-    });
+    expect(
+      screen.getByRole("dialog", {
+        name: "Delete task?",
+      }),
+    ).toBeInTheDocument();
 
-    await user.click(deleteButtons[1]);
+    await user.click(
+      screen.getByRole("button", {
+        name: "Confirm delete Build authentication",
+      }),
+    );
 
     expect(onDelete).toHaveBeenCalledWith("task-123");
 
     expect(
-      screen.queryByRole("heading", { name: "Delete task?" }),
+      screen.queryByRole("dialog", {
+        name: "Delete task?",
+      }),
     ).not.toBeInTheDocument();
+  });
+
+  it("has no accessibility violations", async () => {
+    const { container } = render(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+    const results = await axe(container);
+
+    expect(results.violations).toHaveLength(0);
+  });
+
+  it("gives the status control an accessible name", () => {
+    render(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("combobox", {
+        name: "Status for Build authentication",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("gives task actions accessible names", () => {
+    render(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Edit Build authentication",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", {
+        name: "Delete Build authentication",
+      }),
+    ).toBeInTheDocument();
   });
 });

@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import EditTaskModal from "./EditTaskModal";
+import { axe } from "jest-axe";
 
 const task = {
   id: "task-123",
@@ -74,5 +75,25 @@ describe("EditTaskModal", () => {
     await user.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("has no accessibility violations", async () => {
+    const { container } = render(
+      <EditTaskModal task={task} onClose={vi.fn()} onUpdate={vi.fn()} />,
+    );
+
+    const results = await axe(container);
+
+    expect(results.violations).toHaveLength(0);
+  });
+
+  it("renders as an accessible dialog", () => {
+    render(<EditTaskModal task={task} onClose={vi.fn()} onUpdate={vi.fn()} />);
+
+    expect(
+      screen.getByRole("dialog", {
+        name: "Edit Task",
+      }),
+    ).toBeInTheDocument();
   });
 });

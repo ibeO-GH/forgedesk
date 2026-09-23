@@ -25,12 +25,16 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
         </div>
       </div>
       <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
+        <label className="sr-only" htmlFor={`task-status-${task.id}`}>
+          Status for {task.title}
+        </label>
         <select
+          id={`task-status-${task.id}`}
           value={task.status}
           onChange={(event) =>
             onUpdateStatus(task.id, event.target.value as Task["status"])
           }
-          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-gray-900 sm:flex-none"
+          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300 sm:flex-none"
         >
           <option value="todo">To Do</option>
           <option value="in-progress">In Progress</option>
@@ -40,6 +44,7 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
         <button
           type="button"
           onClick={() => onEdit(task)}
+          aria-label={`Edit ${task.title}`}
           className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:flex-none"
         >
           Edit
@@ -48,6 +53,7 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
         <button
           type="button"
           onClick={() => setIsDeleteConfirmOpen(true)}
+          aria-label={`Delete ${task.title}`}
           className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 sm:flex-none"
         >
           Delete
@@ -55,13 +61,25 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
       </div>
 
       {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-task-title"
+          aria-describedby="delete-task-description"
+        >
           <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2
+              id="delete-task-title"
+              className="text-lg font-semibold text-gray-900"
+            >
               Delete task?
             </h2>
 
-            <p className="mt-2 text-sm text-gray-500">
+            <p
+              id="delete-task-description"
+              className="mt-2 text-sm text-gray-500"
+            >
               Are you sure you want to delete this task? This action cannot be
               undone.
             </p>
@@ -70,18 +88,19 @@ function TaskItem({ task, onEdit, onUpdateStatus, onDelete }: TaskItemProps) {
               <button
                 type="button"
                 onClick={() => setIsDeleteConfirmOpen(false)}
-                className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2"
               >
                 Cancel
               </button>
 
               <button
                 type="button"
+                aria-label={`Confirm delete ${task.title}`}
                 onClick={() => {
                   onDelete(task.id);
                   setIsDeleteConfirmOpen(false);
                 }}
-                className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700"
+                className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
               >
                 Delete
               </button>

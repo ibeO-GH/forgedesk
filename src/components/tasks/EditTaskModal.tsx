@@ -29,15 +29,26 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-task-title"
+    >
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Edit Task</h2>
+          <h2
+            id="edit-task-title"
+            className="text-lg font-semibold text-gray-900"
+          >
+            Edit Task
+          </h2>
 
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            aria-label="Close edit task dialog"
+            className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
           >
             ✕
           </button>
@@ -57,7 +68,7 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300"
             />
           </div>
 
@@ -75,7 +86,7 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
               onChange={(event) =>
                 setPriority(event.target.value as TaskPriority)
               }
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -87,14 +98,14 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
+              className="flex-1 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
             >
               Save Changes
             </button>

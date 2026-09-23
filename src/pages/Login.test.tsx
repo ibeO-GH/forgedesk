@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Login from "./Login";
+import { axe } from "jest-axe";
 
 const { loginUser, login } = vi.hoisted(() => ({
   loginUser: vi.fn(),
@@ -118,5 +119,13 @@ describe("Login", () => {
     await user.click(screen.getByRole("button", { name: "Create one" }));
 
     expect(onRegister).toHaveBeenCalledTimes(1);
+  });
+
+  it("has no accessibility violations", async () => {
+    const { container } = render(<Login onRegister={vi.fn()} />);
+
+    const results = await axe(container);
+
+    expect(results.violations).toHaveLength(0);
   });
 });

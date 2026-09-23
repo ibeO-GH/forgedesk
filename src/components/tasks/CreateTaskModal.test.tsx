@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import CreateTaskModal from "./CreateTaskModal";
+import { axe } from "jest-axe";
 
 describe("CreateTaskModal", () => {
   it("renders the create task form", () => {
@@ -50,5 +51,25 @@ describe("CreateTaskModal", () => {
     expect(onCreate).toHaveBeenCalledWith("Build authentication", "high");
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("has no accessibility violations", async () => {
+    const { container } = render(
+      <CreateTaskModal onClose={vi.fn()} onCreate={vi.fn()} />,
+    );
+
+    const results = await axe(container);
+
+    expect(results.violations).toHaveLength(0);
+  });
+
+  it("renders as an accessible dialog", () => {
+    render(<CreateTaskModal onClose={vi.fn()} onCreate={vi.fn()} />);
+
+    expect(
+      screen.getByRole("dialog", {
+        name: "Create Task",
+      }),
+    ).toBeInTheDocument();
   });
 });
