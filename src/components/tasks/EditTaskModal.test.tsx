@@ -96,4 +96,34 @@ describe("EditTaskModal", () => {
       }),
     ).toBeInTheDocument();
   });
+
+  it("shows a submitting state while saving", () => {
+    render(
+      <EditTaskModal
+        task={task}
+        onClose={vi.fn()}
+        onUpdate={vi.fn()}
+        isSubmitting
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Saving..." })).toBeDisabled();
+    expect(screen.getByLabelText("Task title")).toBeDisabled();
+    expect(screen.getByLabelText("Priority")).toBeDisabled();
+  });
+
+  it("displays an error when task update fails", () => {
+    render(
+      <EditTaskModal
+        task={task}
+        onClose={vi.fn()}
+        onUpdate={vi.fn()}
+        error={new Error("Failed to update task")}
+      />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Failed to update task",
+    );
+  });
 });

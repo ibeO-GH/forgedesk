@@ -35,7 +35,10 @@ function App() {
 
   if (isAuthLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div
+        className="flex min-h-screen items-center justify-center bg-gray-50"
+        aria-live="polite"
+      >
         <p className="text-sm text-gray-500">Checking your session...</p>
       </div>
     );
@@ -65,15 +68,23 @@ function App() {
           onUpdateStatus={(taskId, status) =>
             updateTaskStatusMutation.mutate({ taskId, status })
           }
-          onDeleteTask={(taskId) => {
-            deleteTaskMutation.mutate(taskId);
-          }}
+          onDeleteTask={(taskId) => deleteTaskMutation.mutateAsync(taskId)}
+          isUpdatingStatus={updateTaskStatusMutation.isPending}
+          statusError={updateTaskStatusMutation.error}
+          isDeleting={deleteTaskMutation.isPending}
+          deleteError={deleteTaskMutation.error}
         />
       </div>
 
       {isCreateTaskOpen && (
         <CreateTaskModal
-          onClose={() => setIsCreateTaskOpen(false)}
+          onClose={() => {
+            if (!createTaskMutation.isPending) {
+              setIsCreateTaskOpen(false);
+            }
+          }}
+          isSubmitting={createTaskMutation.isPending}
+          error={createTaskMutation.error}
           onCreate={(title, priority) => {
             createTaskMutation.mutate(
               { title, priority },
@@ -90,7 +101,13 @@ function App() {
       {editingTask && (
         <EditTaskModal
           task={editingTask}
-          onClose={() => setEditingTask(null)}
+          onClose={() => {
+            if (!updateTaskMutation.isPending) {
+              setEditingTask(null);
+            }
+          }}
+          isSubmitting={updateTaskMutation.isPending}
+          error={updateTaskMutation.error}
           onUpdate={(taskId, updates) => {
             updateTaskMutation.mutate(
               {

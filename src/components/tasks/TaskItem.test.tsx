@@ -224,4 +224,92 @@ describe("TaskItem", () => {
       }),
     ).toBeInTheDocument();
   });
+
+  it("disables the status control while updating", () => {
+    render(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+        isUpdatingStatus
+      />,
+    );
+
+    expect(screen.getByLabelText(`Status for ${task.title}`)).toBeDisabled();
+  });
+
+  it("displays a status update error", () => {
+    render(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+        statusError={new Error("Failed to update status")}
+      />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Failed to update status",
+    );
+  });
+
+  it("shows a deleting state while deleting", async () => {
+    const user = userEvent.setup();
+
+    const { rerender } = render(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+        isDeleting={false}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: `Delete ${task.title}` }),
+    );
+
+    rerender(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+        isDeleting
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: `Confirm delete ${task.title}` }),
+    ).toHaveTextContent("Deleting...");
+
+    expect(
+      screen.getByRole("button", { name: `Confirm delete ${task.title}` }),
+    ).toBeDisabled();
+  });
+
+  it("displays a delete error", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TaskItem
+        task={task}
+        onEdit={vi.fn()}
+        onUpdateStatus={vi.fn()}
+        onDelete={vi.fn()}
+        deleteError={new Error("Failed to delete task")}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: `Delete ${task.title}` }),
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Failed to delete task",
+    );
+  });
 });

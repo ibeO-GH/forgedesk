@@ -49,8 +49,6 @@ describe("CreateTaskModal", () => {
     await user.click(screen.getByRole("button", { name: "Create Task" }));
 
     expect(onCreate).toHaveBeenCalledWith("Build authentication", "high");
-
-    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("has no accessibility violations", async () => {
@@ -71,5 +69,29 @@ describe("CreateTaskModal", () => {
         name: "Create Task",
       }),
     ).toBeInTheDocument();
+  });
+
+  it("shows a submitting state while creating a task", () => {
+    render(
+      <CreateTaskModal onClose={vi.fn()} onCreate={vi.fn()} isSubmitting />,
+    );
+
+    expect(screen.getByRole("button", { name: "Creating..." })).toBeDisabled();
+    expect(screen.getByLabelText("Task title")).toBeDisabled();
+    expect(screen.getByLabelText("Priority")).toBeDisabled();
+  });
+
+  it("displays an error when task creation fails", () => {
+    render(
+      <CreateTaskModal
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        error={new Error("Failed to create task")}
+      />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Failed to create task",
+    );
   });
 });

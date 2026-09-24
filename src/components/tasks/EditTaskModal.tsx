@@ -9,16 +9,24 @@ interface EditTaskModalProps {
     taskId: string,
     updates: Partial<Pick<Task, "title" | "priority">>,
   ) => void;
+  isSubmitting?: boolean;
+  error?: Error | null;
 }
 
-function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
+function EditTaskModal({
+  task,
+  onClose,
+  onUpdate,
+  isSubmitting = false,
+  error = null,
+}: EditTaskModalProps) {
   const [title, setTitle] = useState(task.title);
   const [priority, setPriority] = useState<TaskPriority>(task.priority);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!title.trim()) {
+    if (!title.trim() || isSubmitting) {
       return;
     }
 
@@ -47,8 +55,9 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
           <button
             type="button"
             onClick={onClose}
+            disabled={isSubmitting}
             aria-label="Close edit task dialog"
-            className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+            className="text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
           >
             ✕
           </button>
@@ -68,7 +77,8 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300"
+              disabled={isSubmitting}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
             />
           </div>
 
@@ -86,7 +96,8 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
               onChange={(event) =>
                 setPriority(event.target.value as TaskPriority)
               }
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300"
+              disabled={isSubmitting}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -94,20 +105,31 @@ function EditTaskModal({ task, onClose, onUpdate }: EditTaskModalProps) {
             </select>
           </div>
 
+          {error && (
+            <div
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+            >
+              {error.message || "Failed to update task. Please try again."}
+            </div>
+          )}
+
           <div className="flex gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2"
+              disabled={isSubmitting}
+              className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+              disabled={isSubmitting || !title.trim()}
+              className="flex-1 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
             >
-              Save Changes
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

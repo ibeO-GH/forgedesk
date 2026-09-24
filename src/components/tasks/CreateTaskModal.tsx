@@ -5,23 +5,27 @@ import type { TaskPriority } from "../../types/task";
 interface CreateTaskModalProps {
   onClose: () => void;
   onCreate: (title: string, priority: TaskPriority) => void;
+  isSubmitting?: boolean;
+  error?: Error | null;
 }
 
-function CreateTaskModal({ onClose, onCreate }: CreateTaskModalProps) {
+function CreateTaskModal({
+  onClose,
+  onCreate,
+  isSubmitting = false,
+  error = null,
+}: CreateTaskModalProps) {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<TaskPriority>("medium");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!title.trim()) {
+    if (!title.trim() || isSubmitting) {
       return;
     }
 
     onCreate(title.trim(), priority);
-    setTitle("");
-    setPriority("medium");
-    onClose();
   }
 
   return (
@@ -43,8 +47,9 @@ function CreateTaskModal({ onClose, onCreate }: CreateTaskModalProps) {
           <button
             type="button"
             onClick={onClose}
+            disabled={isSubmitting}
             aria-label="Close create task dialog"
-            className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+            className="text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
           >
             ✕
           </button>
@@ -65,7 +70,8 @@ function CreateTaskModal({ onClose, onCreate }: CreateTaskModalProps) {
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. Build authentication"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300"
+              disabled={isSubmitting}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
             />
           </div>
 
@@ -83,7 +89,8 @@ function CreateTaskModal({ onClose, onCreate }: CreateTaskModalProps) {
               onChange={(event) =>
                 setPriority(event.target.value as TaskPriority)
               }
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300"
+              disabled={isSubmitting}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -91,11 +98,21 @@ function CreateTaskModal({ onClose, onCreate }: CreateTaskModalProps) {
             </select>
           </div>
 
+          {error && (
+            <div
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+            >
+              {error.message || "Failed to create task. Please try again."}
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+            disabled={isSubmitting || !title.trim()}
+            className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
           >
-            Create Task
+            {isSubmitting ? "Creating..." : "Create Task"}
           </button>
         </form>
       </div>
