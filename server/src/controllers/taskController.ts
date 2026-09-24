@@ -72,7 +72,7 @@ export async function updateTask(
       },
       updates,
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );

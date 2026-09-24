@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createTaskSchema = z.object({
+export const createTaskSchema = z.strictObject({
   title: z
     .string()
     .trim()
@@ -11,7 +11,7 @@ export const createTaskSchema = z.object({
 });
 
 export const updateTaskSchema = z
-  .object({
+  .strictObject({
     title: z
       .string()
       .trim()

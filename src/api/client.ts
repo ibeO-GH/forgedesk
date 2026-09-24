@@ -1,0 +1,42 @@
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+interface ApiErrorResponse {
+  message?: string;
+}
+
+export async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const token = localStorage.getItem("forgedesk_token");
+
+  const headers = new Headers(options.headers);
+
+  if (!headers.has("Content-Type") && options.body) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  const contentType = response.headers.get("content-type");
+  const isJson = contentType?.includes("application/json");
+
+  const data = isJson ? await response.json() : null;
+
+  if (!response.ok) {
+    const message =
+      (data as ApiErrorResponse | null)?.message ||
+      "Something went wrong. Please try again.";
+
+    throw new Error(message);
+  }
+
+  return data as T;
+}

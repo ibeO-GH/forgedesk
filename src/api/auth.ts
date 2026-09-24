@@ -1,3 +1,5 @@
+import { apiRequest } from "./client";
+
 export type UserRole = "user" | "admin";
 
 export interface AuthUser {
@@ -12,27 +14,17 @@ interface AuthResponse {
   token: string;
 }
 
-const API_URL = "http://localhost:5000/api";
-
 export async function login(
   email: string,
   password: string,
 ): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/auth/login`, {
+  return apiRequest<AuthResponse>("/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({
+      email,
+      password,
+    }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to login");
-  }
-
-  return data;
 }
 
 export async function register(
@@ -40,21 +32,14 @@ export async function register(
   email: string,
   password: string,
 ): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/auth/register`, {
+  return apiRequest<AuthResponse>("/auth/register", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({
+      name,
+      email,
+      password,
+    }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to register");
-  }
-
-  return data;
 }
 
 export async function getCurrentUser(): Promise<AuthUser> {
@@ -64,17 +49,5 @@ export async function getCurrentUser(): Promise<AuthUser> {
     throw new Error("No authentication token");
   }
 
-  const response = await fetch(`${API_URL}/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to verify session");
-  }
-
-  return data;
+  return apiRequest<AuthUser>("/auth/me");
 }

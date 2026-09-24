@@ -197,6 +197,206 @@ describe("Task API", () => {
   });
 });
 
+describe("Task API hardening", () => {
+  it("rejects an invalid JWT", async () => {
+    const response = await request(app)
+      .get("/api/tasks")
+      .set("Authorization", "Bearer invalid-token");
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe("Invalid or expired token");
+  });
+
+  it("rejects an invalid task ID", async () => {
+    const registerResponse = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Task User",
+        email: "invalid-id@example.com",
+        password: "TestPassword123",
+      });
+
+    const response = await request(app)
+      .patch("/api/tasks/not-a-valid-id")
+      .set("Authorization", `Bearer ${registerResponse.body.token}`)
+      .send({
+        status: "done",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Validation failed");
+    expect(response.body.errors[0].field).toBe("id");
+  });
+
+  it("rejects an invalid priority", async () => {
+    const registerResponse = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Task User",
+        email: "invalid-priority@example.com",
+        password: "TestPassword123",
+      });
+
+    const response = await request(app)
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${registerResponse.body.token}`)
+      .send({
+        title: "Invalid priority task",
+        priority: "urgent",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Validation failed");
+    expect(response.body.errors[0].field).toBe("priority");
+  });
+
+  it("rejects an invalid status", async () => {
+    const registerResponse = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Task User",
+        email: "invalid-status@example.com",
+        password: "TestPassword123",
+      });
+
+    const createResponse = await request(app)
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${registerResponse.body.token}`)
+      .send({
+        title: "Status validation task",
+        priority: "medium",
+      });
+
+    const response = await request(app)
+      .patch(`/api/tasks/${createResponse.body._id}`)
+      .set("Authorization", `Bearer ${registerResponse.body.token}`)
+      .send({
+        status: "invalid-status",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Validation failed");
+    expect(response.body.errors[0].field).toBe("status");
+  });
+
+  it("rejects an empty task update", async () => {
+    const registerResponse = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Task User",
+        email: "empty-update@example.com",
+        password: "TestPassword123",
+      });
+
+    const createResponse = await request(app)
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${registerResponse.body.token}`)
+      .send({
+        title: "Task for empty update",
+        priority: "low",
+      });
+
+    const response = await request(app)
+      .patch(`/api/tasks/${createResponse.body._id}`)
+      .set("Authorization", `Bearer ${registerResponse.body.token}`)
+      .send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Validation failed");
+  });
+
+  it("rejects unexpected fields when creating a task", async () => {
+    const registerResponse = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Task User",
+        email: "strict-create@example.com",
+        password: "TestPassword123",
+      });
+
+    const response = await request(app)
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${registerResponse.body.token}`)
+      .send({
+        title: "Strict validation task",
+        priority: "medium",
+        userId: "should-not-be-accepted",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Validation failed");
+  });
+
+  it("prevents a user from updating another user's task", async () => {
+    const firstUser = await request(app).post("/api/auth/register").send({
+      name: "First User",
+      email: "update-owner@example.com",
+      password: "TestPassword123",
+    });
+
+    const secondUser = await request(app).post("/api/auth/register").send({
+      name: "Second User",
+      email: "update-attacker@example.com",
+      password: "TestPassword123",
+    });
+
+    const createResponse = await request(app)
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${firstUser.body.token}`)
+      .send({
+        title: "Protected task",
+        priority: "high",
+      });
+
+    const response = await request(app)
+      .patch(`/api/tasks/${createResponse.body._id}`)
+      .set("Authorization", `Bearer ${secondUser.body.token}`)
+      .send({
+        title: "Unauthorized update",
+      });
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Task not found");
+  });
+
+  it("prevents a user from deleting another user's task", async () => {
+    const firstUser = await request(app).post("/api/auth/register").send({
+      name: "First User",
+      email: "delete-owner@example.com",
+      password: "TestPassword123",
+    });
+
+    const secondUser = await request(app).post("/api/auth/register").send({
+      name: "Second User",
+      email: "delete-attacker@example.com",
+      password: "TestPassword123",
+    });
+
+    const createResponse = await request(app)
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${firstUser.body.token}`)
+      .send({
+        title: "Protected delete task",
+        priority: "high",
+      });
+
+    const response = await request(app)
+      .delete(`/api/tasks/${createResponse.body._id}`)
+      .set("Authorization", `Bearer ${secondUser.body.token}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Task not found");
+
+    const ownerTasks = await request(app)
+      .get("/api/tasks")
+      .set("Authorization", `Bearer ${firstUser.body.token}`);
+
+    expect(ownerTasks.status).toBe(200);
+    expect(ownerTasks.body).toHaveLength(1);
+    expect(ownerTasks.body[0].title).toBe("Protected delete task");
+  });
+});
+
 describe("Role authorization", () => {
   it("rejects a normal user from the admin endpoint", async () => {
     const registerResponse = await request(app)

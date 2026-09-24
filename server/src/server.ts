@@ -10,7 +10,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 async function startServer() {
   try {
     if (!MONGODB_URI) {
-      throw new Error("MONOGODB_URI is not defined");
+      throw new Error("MONGODB_URI is not defined");
     }
 
     if (!process.env.JWT_SECRET) {

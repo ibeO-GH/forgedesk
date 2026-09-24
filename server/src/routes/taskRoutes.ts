@@ -11,6 +11,7 @@ import {
   createTaskSchema,
   updateTaskSchema,
 } from "../validation/taskSchemas.js";
+import { taskIdSchema } from "../validation/taskParams.js";
 
 const router = Router();
 
@@ -20,8 +21,13 @@ router.post("/", validate(createTaskSchema), createTask);
 
 router.get("/", getTasks);
 
-router.patch("/:id", validate(updateTaskSchema), updateTask);
+router.patch(
+  "/:id",
+  validate(taskIdSchema, "params"),
+  validate(updateTaskSchema),
+  updateTask,
+);
 
-router.delete("/:id", deleteTask);
+router.delete("/:id", validate(taskIdSchema, "params"), deleteTask);
 
 export default router;
