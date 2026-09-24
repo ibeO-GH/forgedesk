@@ -397,6 +397,14 @@ describe("Task API hardening", () => {
   });
 });
 
+describe("API error handling", () => {
+  it("returns a consistent response for an unexpected route", async () => {
+    const response = await request(app).get("/api/does-not-exist");
+
+    expect(response.status).toBe(404);
+  });
+});
+
 describe("Role authorization", () => {
   it("rejects a normal user from the admin endpoint", async () => {
     const registerResponse = await request(app)

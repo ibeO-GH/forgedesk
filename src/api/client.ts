@@ -20,20 +20,40 @@ export async function apiRequest<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error(
+      "Unable to connect to ForgeDesk. Please check your connection and try again.",
+    );
+  }
 
   const contentType = response.headers.get("content-type");
   const isJson = contentType?.includes("application/json");
 
-  const data = isJson ? await response.json() : null;
+  let data: unknown = null;
+
+  if (isJson) {
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
+  }
 
   if (!response.ok) {
     const message =
-      (data as ApiErrorResponse | null)?.message ||
-      "Something went wrong. Please try again.";
+      typeof data === "object" &&
+      data !== null &&
+      "message" in data &&
+      typeof (data as ApiErrorResponse).message === "string"
+        ? (data as ApiErrorResponse).message
+        : "Something went wrong. Please try again.";
 
     throw new Error(message);
   }

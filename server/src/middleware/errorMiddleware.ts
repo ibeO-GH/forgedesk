@@ -1,14 +1,36 @@
-import type { NextFunction, Request, Response } from "express";
+import type { ErrorRequestHandler } from "express";
+import mongoose from "mongoose";
 
-export function errorHandler(
-  error: Error,
-  _req: Request,
-  res: Response,
-  _next: NextFunction,
-) {
+export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
   console.error(error);
 
-  res.status(500).json({
+  if (error instanceof mongoose.Error.ValidationError) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: Object.values(error.errors).map((fieldError) => ({
+        field: fieldError.path,
+        message: fieldError.message,
+      })),
+    });
+  }
+
+  if (error instanceof mongoose.Error.CastError) {
+    return res.status(400).json({
+      message: "Invalid resource identifier",
+    });
+  }
+
+  if (
+    error instanceof Error &&
+    "code" in error &&
+    (error as { code?: number }).code === 11000
+  ) {
+    return res.status(409).json({
+      message: "A resource with the provided value already exists",
+    });
+  }
+
+  return res.status(500).json({
     message: "Internal server error",
   });
-}
+};
