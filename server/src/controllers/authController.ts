@@ -43,7 +43,7 @@ export async function register(
       },
       process.env.JWT_SECRET as string,
       {
-        expiresIn: "7d",
+        expiresIn: "1d",
       },
     );
 
@@ -100,7 +100,7 @@ export async function login(
       },
       process.env.JWT_SECRET as string,
       {
-        expiresIn: "7d",
+        expiresIn: "1d",
       },
     );
 
