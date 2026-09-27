@@ -53,7 +53,7 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 sm:flex-row">
+    <div className="flex min-h-screen flex-col bg-slate-50 sm:flex-row">
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col">

@@ -18,6 +18,6 @@ describe("TaskBadge", () => {
   it("formats the in-progress status label", () => {
     render(<TaskBadge type="status" value="in-progress" />);
 
-    expect(screen.getByText("inprogress")).toBeInTheDocument();
+    expect(screen.getByText("In Progress")).toBeInTheDocument();
   });
 });

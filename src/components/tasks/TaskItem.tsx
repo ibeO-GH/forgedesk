@@ -39,87 +39,106 @@ function TaskItem({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-sm sm:flex-row sm:items-center sm:justify-between">
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="break-words font-medium text-gray-900">{task.title}</p>
+    <>
+      <article className="group rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p
+                className="break-words text-sm font-semibold leading-6 text-slate-900 sm:text-base"
+                title={task.title}
+              >
+                {task.title}
+              </p>
 
-          <TaskBadge type="priority" value={task.priority} />
+              <TaskBadge type="priority" value={task.priority} />
+            </div>
+
+            <div className="mt-3 flex items-center gap-2">
+              <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Status
+              </span>
+
+              <TaskBadge type="status" value={task.status} />
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto lg:shrink-0">
+            <div className="min-w-0 sm:min-w-36">
+              <label className="sr-only" htmlFor={`task-status-${task.id}`}>
+                Status for {task.title}
+              </label>
+
+              <select
+                id={`task-status-${task.id}`}
+                value={task.status}
+                disabled={isUpdatingStatus}
+                onChange={(event) =>
+                  onUpdateStatus(task.id, event.target.value as Task["status"])
+                }
+                className="fd-input disabled:cursor-not-allowed"
+              >
+                <option value="todo">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onEdit(task)}
+              disabled={isUpdatingStatus || isDeleting}
+              aria-label={`Edit ${task.title}`}
+              className="fd-button-secondary"
+            >
+              Edit
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsDeleteConfirmOpen(true)}
+              disabled={isUpdatingStatus || isDeleting}
+              aria-label={`Delete ${task.title}`}
+              className="inline-flex items-center justify-center rounded-xl border border-red-100 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 shadow-sm transition duration-200 hover:border-red-200 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Delete
+            </button>
+          </div>
         </div>
 
-        <div className="mt-2">
-          <TaskBadge type="status" value={task.status} />
-        </div>
-      </div>
-
-      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
-        <label className="sr-only" htmlFor={`task-status-${task.id}`}>
-          Status for {task.title}
-        </label>
-
-        <select
-          id={`task-status-${task.id}`}
-          value={task.status}
-          disabled={isUpdatingStatus}
-          onChange={(event) =>
-            onUpdateStatus(task.id, event.target.value as Task["status"])
-          }
-          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60 focus:border-gray-900 focus:ring-2 focus:ring-gray-300 sm:flex-none"
-        >
-          <option value="todo">To Do</option>
-          <option value="in-progress">In Progress</option>
-          <option value="done">Done</option>
-        </select>
-
-        <button
-          type="button"
-          onClick={() => onEdit(task)}
-          disabled={isUpdatingStatus || isDeleting}
-          aria-label={`Edit ${task.title}`}
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 sm:flex-none"
-        >
-          Edit
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setIsDeleteConfirmOpen(true)}
-          disabled={isUpdatingStatus || isDeleting}
-          aria-label={`Delete ${task.title}`}
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 sm:flex-none"
-        >
-          Delete
-        </button>
-      </div>
-
-      {statusError && (
-        <div
-          className="basis-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-          role="alert"
-        >
-          {statusError.message || "Failed to update task status."}
-        </div>
-      )}
+        {statusError && (
+          <div
+            className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
+            role="alert"
+          >
+            {statusError.message || "Failed to update task status."}
+          </div>
+        )}
+      </article>
 
       {isDeleteConfirmOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-task-title"
           aria-describedby="delete-task-description"
         >
-          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-50 text-red-600">
+              !
+            </div>
+
             <h2
               id="delete-task-title"
-              className="text-lg font-semibold text-gray-900"
+              className="mt-5 text-lg font-bold text-slate-900"
             >
               Delete task?
             </h2>
 
             <p
               id="delete-task-description"
-              className="mt-2 text-sm text-gray-500"
+              className="mt-2 text-sm leading-6 text-slate-500"
             >
               Are you sure you want to delete this task? This action cannot be
               undone.
@@ -127,7 +146,7 @@ function TaskItem({
 
             {deleteError && (
               <div
-                className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+                className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
                 role="alert"
               >
                 {deleteError.message ||
@@ -140,7 +159,7 @@ function TaskItem({
                 type="button"
                 onClick={() => setIsDeleteConfirmOpen(false)}
                 disabled={isDeleting}
-                className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2"
+                className="fd-button-secondary flex-1"
               >
                 Cancel
               </button>
@@ -150,7 +169,7 @@ function TaskItem({
                 aria-label={`Confirm delete ${task.title}`}
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+                className="inline-flex flex-1 items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>
@@ -158,7 +177,7 @@ function TaskItem({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

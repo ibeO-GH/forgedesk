@@ -33,7 +33,7 @@ describe("Register", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Create your ForgeDesk account",
+        name: "Create your account",
       }),
     ).toBeInTheDocument();
 

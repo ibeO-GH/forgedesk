@@ -30,36 +30,48 @@ function CreateTaskModal({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="create-task-title"
     >
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <div className="mb-6 flex items-center justify-between">
-          <h2
-            id="create-task-title"
-            className="text-lg font-semibold text-gray-900"
-          >
-            Create Task
-          </h2>
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <div className="border-b border-slate-100 px-6 py-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                +
+              </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            aria-label="Close create task dialog"
-            className="text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
-          >
-            ✕
-          </button>
+              <h2
+                id="create-task-title"
+                className="mt-4 text-lg font-bold tracking-tight text-slate-900"
+              >
+                Create Task
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Add a new task to your workspace.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              aria-label="Close create task dialog"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+            >
+              <span aria-hidden="true">✕</span>
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5 p-6">
           <div>
             <label
               htmlFor="title"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-2 block text-sm font-semibold text-slate-700"
             >
               Task title
             </label>
@@ -71,14 +83,14 @@ function CreateTaskModal({
               onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. Build authentication"
               disabled={isSubmitting}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
+              className="fd-input"
             />
           </div>
 
           <div>
             <label
               htmlFor="priority"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-2 block text-sm font-semibold text-slate-700"
             >
               Priority
             </label>
@@ -90,7 +102,7 @@ function CreateTaskModal({
                 setPriority(event.target.value as TaskPriority)
               }
               disabled={isSubmitting}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
+              className="fd-input"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -101,7 +113,7 @@ function CreateTaskModal({
           {error && (
             <div
               role="alert"
-              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700"
             >
               {error.message || "Failed to create task. Please try again."}
             </div>
@@ -110,7 +122,7 @@ function CreateTaskModal({
           <button
             type="submit"
             disabled={isSubmitting || !title.trim()}
-            className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+            className="fd-button-primary w-full"
           >
             {isSubmitting ? "Creating..." : "Create Task"}
           </button>

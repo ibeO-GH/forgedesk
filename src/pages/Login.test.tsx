@@ -32,7 +32,7 @@ describe("Login", () => {
     render(<Login onRegister={vi.fn()} />);
 
     expect(
-      screen.getByRole("heading", { name: "Welcome to ForgeDesk" }),
+      screen.getByRole("heading", { name: "Welcome back" }),
     ).toBeInTheDocument();
 
     expect(screen.getByLabelText("Email")).toBeInTheDocument();

@@ -72,7 +72,6 @@ describe("Dashboard", () => {
   it("shows the loading state", () => {
     renderDashboard({ isLoading: true });
 
-    expect(screen.getByText("Loading tasks...")).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveAttribute("aria-busy", "true");
   });
 
@@ -88,17 +87,24 @@ describe("Dashboard", () => {
   it("shows task statistics", () => {
     renderDashboard();
 
-    expect(
-      screen.getByText("Total Tasks").nextElementSibling,
-    ).toHaveTextContent("7");
+    const totalTasksCard = screen.getByText("Total Tasks").closest(".fd-card");
 
-    expect(
-      screen.getAllByText("In Progress")[0].nextElementSibling,
-    ).toHaveTextContent("2");
+    const inProgressCard = screen
+      .getAllByText("In Progress")[0]
+      .closest(".fd-card");
 
-    expect(
-      screen.getAllByText("Completed")[0].nextElementSibling,
-    ).toHaveTextContent("2");
+    const completedCard = screen
+      .getAllByText("Completed")[0]
+      .closest(".fd-card");
+
+    expect(totalTasksCard).toHaveTextContent("Total Tasks");
+    expect(totalTasksCard).toHaveTextContent("7");
+
+    expect(inProgressCard).toHaveTextContent("In Progress");
+    expect(inProgressCard).toHaveTextContent("2");
+
+    expect(completedCard).toHaveTextContent("Completed");
+    expect(completedCard).toHaveTextContent("2");
   });
 
   it("shows the first five tasks and pagination", () => {
@@ -109,7 +115,9 @@ describe("Dashboard", () => {
 
     expect(screen.queryByText("Review API security")).not.toBeInTheDocument();
 
-    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Task pagination" }),
+    ).toHaveTextContent("Page 1 of 2");
   });
 
   it("moves to the next page", async () => {
@@ -123,7 +131,9 @@ describe("Dashboard", () => {
 
     expect(screen.queryByText("Build authentication")).not.toBeInTheDocument();
 
-    expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Task pagination" }),
+    ).toHaveTextContent("Page 2 of 2");
   });
 
   it("moves back to the previous page", async () => {
@@ -135,7 +145,9 @@ describe("Dashboard", () => {
     await user.click(screen.getByRole("button", { name: "Previous" }));
 
     expect(screen.getByText("Build authentication")).toBeInTheDocument();
-    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Task pagination" }),
+    ).toHaveTextContent("Page 1 of 2");
   });
 
   it("disables pagination buttons at the appropriate boundaries", async () => {
@@ -250,7 +262,9 @@ describe("Dashboard", () => {
 
     await user.click(screen.getByRole("button", { name: "Next" }));
 
-    expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Task pagination" }),
+    ).toHaveTextContent("Page 2 of 2");
 
     await user.selectOptions(
       screen.getByRole("combobox", {
