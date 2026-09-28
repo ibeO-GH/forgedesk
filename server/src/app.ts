@@ -10,11 +10,14 @@ import { errorHandler } from "./middleware/errorMiddleware.js";
 
 const app = express();
 
-const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const clientUrls = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((url) => url.trim())
+  .filter(Boolean);
 
 app.use(
   cors({
-    origin: clientUrl,
+    origin: clientUrls,
   }),
 );
 
